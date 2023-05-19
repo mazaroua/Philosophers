@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 typedef struct data
 {
@@ -14,17 +15,23 @@ typedef struct data
 	int				time_to_sleep;
     int				n_of_times_each_philo_must_eat;
 	pthread_mutex_t	*forks;
+    long            start_of_simulation;
+    int             stop;
 }t_data;
 
 typedef struct philo
 {
-    int	id;
-
+    int             id;
+    pthread_t       philo;
+    pthread_mutex_t *right_fork;
+    pthread_mutex_t *left_fork;
+    long            last_meal;
+    t_data          *data;
 }t_philo;
 
 int	ft_atoi(const char *str);
 int	ft_isdigit(int c);
 int parsing(char **av);
-
+long	curr_time(void);
 
 #endif

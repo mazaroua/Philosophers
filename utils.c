@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 17:06:51 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/18 17:07:11 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/19 16:01:26 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,14 @@ int	ft_isdigit(int c)
 		return (1);
 	else
 		return (0);
+}
+
+long	curr_time(void)
+{
+	struct timeval	tv;
+	long			curr_time;
+
+	gettimeofday(&tv, NULL);
+	curr_time = ((tv.tv_sec * 1000000) + tv.tv_usec) / 1000;
+	return (curr_time);
 }

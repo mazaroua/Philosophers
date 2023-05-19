@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 16:53:17 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/18 17:32:11 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/19 18:31:24 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,78 @@ void	init_forks(t_data *data)
 		pthread_mutex_init(&data->forks[i--], NULL);
 }
 
+void	print_state(t_philo *philo, char *state)
+{
+	long	time_of_state;
+
+	time_of_state = curr_time() - philo->data->start_of_simulation;
+	printf("%lu %d %s\n", time_of_state, philo->id, state);
+}
+
+void	start_eating(t_philo *philo)
+{
+	if (curr_time() - philo->last_meal > philo->data->time_to_die)
+	{
+		philo->data->stop = 1;
+		print_state(philo, "died");
+		return ;
+	}
+	pthread_mutex_lock(philo->right_fork);
+	print_state(philo, "has taken a fork");
+	pthread_mutex_lock(philo->left_fork);
+	print_state(philo, "has taken a fork");
+	print_state(philo, "is eating");
+	usleep(philo->data->time_to_eat);
+	philo->last_meal = curr_time();
+	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_unlock(philo->left_fork);
+}
+
+void	*routine(void *arg)
+{
+	t_philo	*philo;
+
+	philo = (t_philo *)arg;
+	while (!philo->data->stop)
+	{
+		if (philo->id % 2 == 0)
+			usleep(100);
+		start_eating(philo);
+		print_state(philo, "is sleeping");
+		usleep(philo->data->time_to_sleep);
+		print_state(philo, "is thinking");
+	}
+	return (NULL);
+}
+
+void	creating_philos(t_data *data)
+{
+	t_philo	*philos;
+	int		i;
+
+	philos = malloc(sizeof(t_philo) * data->number_of_philosophers);
+	i = 0;
+	data->start_of_simulation = curr_time();
+	while (i < data->number_of_philosophers)
+	{
+		philos[i].id = i + 1;
+		if (i == 0)
+			philos[i].right_fork = &data->forks[data->number_of_philosophers - 1];
+		else
+			philos[i].right_fork = &data->forks[i];
+		philos[i].left_fork = &data->forks[i + 1];
+		philos[i].last_meal = curr_time();
+		philos[i].data = data;
+		pthread_create(&philos[i].philo, NULL, &routine, &philos[i]);
+		i++;
+	}
+	while (i)
+	{
+		pthread_join(philos[i].philo, NULL);
+		i--;
+	}
+}
+
 int main(int ac, char **av)
 {
 	t_data	data;
@@ -42,10 +114,12 @@ int main(int ac, char **av)
         {
             get_info(&data, ac, av);
 			init_forks(&data);
+			creating_philos(&data);
         }
         else
             printf("Syntax Error\n");
     }
     else
         printf("Number of args should be between 5 or 6\n");
+	return (0);
 }
