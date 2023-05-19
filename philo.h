@@ -15,8 +15,10 @@ typedef struct data
 	int				time_to_sleep;
     int				n_of_times_each_philo_must_eat;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	write;
     long            start_of_simulation;
     int             stop;
+    pthread_t       check_is_dead;
 }t_data;
 
 typedef struct philo
@@ -33,5 +35,8 @@ int	ft_atoi(const char *str);
 int	ft_isdigit(int c);
 int parsing(char **av);
 long	curr_time(void);
+void	ft_usleep(long time);
+void	*check(void	*arg);
+void	print_state(t_philo *philo, char *state);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 16:53:17 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/19 18:31:24 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/19 21:55:29 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,28 +32,16 @@ void	init_forks(t_data *data)
 		pthread_mutex_init(&data->forks[i--], NULL);
 }
 
-void	print_state(t_philo *philo, char *state)
-{
-	long	time_of_state;
-
-	time_of_state = curr_time() - philo->data->start_of_simulation;
-	printf("%lu %d %s\n", time_of_state, philo->id, state);
-}
-
 void	start_eating(t_philo *philo)
 {
-	if (curr_time() - philo->last_meal > philo->data->time_to_die)
-	{
-		philo->data->stop = 1;
-		print_state(philo, "died");
-		return ;
-	}
+	if (philo->data->stop == 1)
+			return ;
 	pthread_mutex_lock(philo->right_fork);
 	print_state(philo, "has taken a fork");
 	pthread_mutex_lock(philo->left_fork);
 	print_state(philo, "has taken a fork");
 	print_state(philo, "is eating");
-	usleep(philo->data->time_to_eat);
+	ft_usleep(philo->data->time_to_eat * 1000);
 	philo->last_meal = curr_time();
 	pthread_mutex_unlock(philo->right_fork);
 	pthread_mutex_unlock(philo->left_fork);
@@ -64,13 +52,18 @@ void	*routine(void *arg)
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
-	while (!philo->data->stop)
+	philo->data->stop = 0;
+	while (philo->data->stop == 0)
 	{
 		if (philo->id % 2 == 0)
-			usleep(100);
+			ft_usleep(100);
 		start_eating(philo);
+		if (philo->data->stop == 1)
+			return (NULL);
 		print_state(philo, "is sleeping");
-		usleep(philo->data->time_to_sleep);
+		ft_usleep(philo->data->time_to_sleep * 1000);
+		if (philo->data->stop == 1)
+			return (NULL);
 		print_state(philo, "is thinking");
 	}
 	return (NULL);
@@ -97,11 +90,13 @@ void	creating_philos(t_data *data)
 		pthread_create(&philos[i].philo, NULL, &routine, &philos[i]);
 		i++;
 	}
+	pthread_create(&data->check_is_dead, NULL, &check, philos);
 	while (i)
 	{
 		pthread_join(philos[i].philo, NULL);
 		i--;
 	}
+	pthread_join(data->check_is_dead, NULL);
 }
 
 int main(int ac, char **av)
@@ -112,6 +107,7 @@ int main(int ac, char **av)
     {
         if (parsing(av))
         {
+			pthread_mutex_init(&data.write, NULL);
             get_info(&data, ac, av);
 			init_forks(&data);
 			creating_philos(&data);

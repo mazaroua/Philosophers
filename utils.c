@@ -6,11 +6,21 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 17:06:51 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/19 16:01:26 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/19 21:40:50 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+void	print_state(t_philo *philo, char *state)
+{
+	long	time_of_state;
+
+	time_of_state = curr_time() - philo->data->start_of_simulation;
+	pthread_mutex_lock(&philo->data->write);
+	printf("%lu %d %s\n", time_of_state, philo->id, state);
+	pthread_mutex_unlock(&philo->data->write);
+}
 
 int	ft_atoi(const char *str)
 {
@@ -51,4 +61,15 @@ long	curr_time(void)
 	gettimeofday(&tv, NULL);
 	curr_time = ((tv.tv_sec * 1000000) + tv.tv_usec) / 1000;
 	return (curr_time);
+}
+
+void	ft_usleep(long time)
+{
+	long int	start;
+
+	start = 0;
+	start = curr_time() * 1000;
+	while (((curr_time() * 1000) - start) <= time)
+		usleep(50);
+	return ;
 }

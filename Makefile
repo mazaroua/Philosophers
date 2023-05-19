@@ -1,7 +1,7 @@
 NAME=philo
 CC=cc
 FLAGS= -Wall -Werror -Wextra
-SRC= main.c parsing.c utils.c
+SRC= main.c parsing.c utils.c dead.c
 OBJ= $(SRC:.c=.o)
 
 all:$(NAME)
