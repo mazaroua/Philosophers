@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 17:06:51 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/19 21:40:50 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/20 17:36:04 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 void	print_state(t_philo *philo, char *state)
 {
-	long	time_of_state;
 
-	time_of_state = curr_time() - philo->data->start_of_simulation;
 	pthread_mutex_lock(&philo->data->write);
-	printf("%lu %d %s\n", time_of_state, philo->id, state);
+	printf("%lu %d %s\n", curr_time() - \
+	philo->data->start_of_simulation, philo->id, state);
 	pthread_mutex_unlock(&philo->data->write);
 }
 
@@ -67,9 +66,8 @@ void	ft_usleep(long time)
 {
 	long int	start;
 
-	start = 0;
 	start = curr_time() * 1000;
-	while (((curr_time() * 1000) - start) <= time)
+	while (((curr_time() * 1000) - start) < time)
 		usleep(50);
 	return ;
 }

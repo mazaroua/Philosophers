@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/19 21:39:57 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/19 21:51:40 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/20 18:43:37 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,17 @@
 
 int	check2(t_philo *philo, t_data *data, int i)
 {
-	if (curr_time() - philo[i].last_meal > data->time_to_die)
+	if (curr_time() - philo[i].last_meal >= data->time_to_die)
 	{
-		data->stop = 1;
-        print_state(philo, "died");
+		pthread_mutex_lock(&data->write);
+		data->dead = 1;
+		printf("%lu %d died\n", curr_time() - data->start_of_simulation, philo[i].id);
 		return (0);
 	}
 	return (1);
 }
 
-void	*check(void	*arg)
+int	check(void	*arg)
 {
 	t_philo	*philo;
 	t_data	*data;
@@ -35,12 +36,13 @@ void	*check(void	*arg)
 	while (1337)
 	{
 		i = 0;
+		usleep(100);
 		while (i < data->number_of_philosophers)
 		{
 			if (!check2(philo, data, i))
-				return (NULL);
+				return (0);
 			i++;
 		}
 	}
-	return (NULL);
+	return (0);
 }
