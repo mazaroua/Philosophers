@@ -14,7 +14,7 @@
 
 int	check2(t_philo *philo, t_data *data, int i)
 {
-	if (curr_time() - philo[i].last_meal >= data->time_to_die)
+	if (curr_time() - philo[i].last_meal > data->time_to_die)
 	{
 		pthread_mutex_lock(&data->write);
 		data->dead = 1;
@@ -36,7 +36,7 @@ int	check(void	*arg)
 	while (1337)
 	{
 		i = 0;
-		usleep(100);
+		usleep(1000);
 		while (i < data->number_of_philosophers)
 		{
 			if (!check2(philo, data, i))
