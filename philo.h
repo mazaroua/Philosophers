@@ -17,8 +17,10 @@ typedef struct data
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	write;
     long            start_of_simulation;
-    int             dead;
+    int             stop_simulation;
     pthread_t       check_is_dead;
+    pthread_mutex_t check;
+    pthread_mutex_t stop;
 }t_data;
 
 typedef struct philo

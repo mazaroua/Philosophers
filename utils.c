@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 17:06:51 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/20 17:36:04 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/21 17:21:42 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ long	curr_time(void)
 	long			curr_time;
 
 	gettimeofday(&tv, NULL);
-	curr_time = ((tv.tv_sec * 1000000) + tv.tv_usec) / 1000;
+	curr_time = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 	return (curr_time);
 }
 
