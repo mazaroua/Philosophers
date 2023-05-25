@@ -6,19 +6,24 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 17:06:51 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/21 17:21:42 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/24 16:42:05 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	print_state(t_philo *philo, char *state)
+int	print_state(t_philo *philo, char *state, int unlock)
 {
-
-	pthread_mutex_lock(&philo->data->write);
-	printf("%lu %d %s\n", curr_time() - \
+	if (pthread_mutex_lock(&philo->data->write) != 0)
+		return (0);
+	printf("\e[1m\e[94m%lu\e[93m %d %s\n\e[0m", curr_time() - \
 	philo->data->start_of_simulation, philo->id, state);
-	pthread_mutex_unlock(&philo->data->write);
+	if (unlock)
+	{
+		if (pthread_mutex_unlock(&philo->data->write) != 0)
+		return (0);
+	}
+	return (1);
 }
 
 int	ft_atoi(const char *str)
@@ -58,7 +63,7 @@ long	curr_time(void)
 	long			curr_time;
 
 	gettimeofday(&tv, NULL);
-	curr_time = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+	curr_time = ((tv.tv_sec * 1000000) + tv.tv_usec) / 1000;
 	return (curr_time);
 }
 
@@ -66,8 +71,8 @@ void	ft_usleep(long time)
 {
 	long int	start;
 
-	start = curr_time() * 1000;
-	while (((curr_time() * 1000) - start) < time)
-		usleep(50);
+	start = curr_time();
+	while (((curr_time()) - start) < time)
+		usleep(100);
 	return ;
 }

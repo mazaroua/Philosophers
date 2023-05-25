@@ -10,17 +10,18 @@
 typedef struct data
 {
     int				number_of_philosophers;
-    long				time_to_die;
+    long			time_to_die;
     int				time_to_eat;
 	int				time_to_sleep;
     int				n_of_times_each_philo_must_eat;
 	pthread_mutex_t	*forks;
+	pthread_mutex_t	last_meal;
 	pthread_mutex_t	write;
     long            start_of_simulation;
-    int             stop_simulation;
-    pthread_t       check_is_dead;
-    pthread_mutex_t check;
-    pthread_mutex_t stop;
+    pthread_mutex_t stop_mutex;
+    pthread_mutex_t eaten_mutex;
+    int             stop;
+    int             all_eaten;
 }t_data;
 
 typedef struct philo
@@ -39,7 +40,7 @@ int		ft_isdigit(int c);
 int		parsing(char **av);
 long	curr_time(void);
 void	ft_usleep(long time);
-int     check(void	*arg);
-void	print_state(t_philo *philo, char *state);
+int	print_state(t_philo *philo, char *state, int unlock);
+int	check(t_philo *philo, t_data *data);
 
 #endif
