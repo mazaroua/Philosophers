@@ -20,6 +20,7 @@ typedef struct data
     long            start_of_simulation;
     pthread_mutex_t stop_mutex;
     pthread_mutex_t eaten_mutex;
+    pthread_mutex_t ate;
     int             stop;
     int             all_eaten;
 }t_data;

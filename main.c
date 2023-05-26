@@ -6,22 +6,27 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/18 16:53:17 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/05/25 20:01:10 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/05/26 16:08:08 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	get_info(t_data *data, int ac, char **av)
+int	get_info(t_data *data, int ac, char **av)
 {
 	data->number_of_philosophers = ft_atoi(av[1]);
 	data->time_to_die = ft_atoi(av[2]);
 	data->time_to_eat = ft_atoi(av[3]);
 	data->time_to_sleep = ft_atoi(av[4]);
 	if (ac == 6)
+	{
 		data->n_of_times_each_philo_must_eat = ft_atoi(av[5]);
+		if (!data->n_of_times_each_philo_must_eat)
+			return (0);
+	}
 	else
 		data->n_of_times_each_philo_must_eat = -1;
+	return (1);
 }
 
 int	init_mutexs(t_data *data)
@@ -44,6 +49,7 @@ int	init_mutexs(t_data *data)
 		return (0);
 	if (pthread_mutex_init(&data->eaten_mutex, NULL) != 0)
 		return (0);
+	pthread_mutex_init(&data->ate, NULL);
 	return (1);
 }
 
@@ -102,19 +108,16 @@ int	start_eating(t_philo *philo)
 		pthread_mutex_unlock(&philo->data->eaten_mutex);
 		return (0);
 	}
-	if (!lock_forks(philo))
-		return (0);
-	if (!print_state(philo, "\x1B[32mis eating", 1))
-		return (0);
-	if (pthread_mutex_lock(&philo->data->last_meal) != 0)
-		return (0);
+	lock_forks(philo);
+	print_state(philo, "\x1B[32mis eating", 1);
+	pthread_mutex_lock(&philo->data->last_meal);
 	philo->last_meal = curr_time();
-	if (pthread_mutex_unlock(&philo->data->last_meal) != 0)
-		return (0);
+	pthread_mutex_unlock(&philo->data->last_meal);
 	ft_usleep(philo->data->time_to_eat);
-	if (!unlock_forks(philo))
-		return (0);
+	unlock_forks(philo);
+	pthread_mutex_lock(&philo->data->ate);
 	philo->ate += 1;
+	pthread_mutex_unlock(&philo->data->ate);
 	return (1);
 }
 
@@ -125,17 +128,11 @@ void	*routine(void *arg)
 	philo = (t_philo *)arg;
 	while (1337)
 	{
-		pthread_mutex_lock(&philo->data->stop_mutex);
-		if (philo->data->stop)
-			return (NULL);
-		pthread_mutex_unlock(&philo->data->stop_mutex);
 		if (!start_eating(philo))
 			return (NULL);
-		if (!print_state(philo, "\033[37;1mis sleeping", 1))
-			return (NULL);
+		print_state(philo, "\033[37;1mis sleeping", 1);
 		ft_usleep(philo->data->time_to_sleep);
-		if (!print_state(philo, "\033[37;1mis thinking", 1))
-			return (NULL);
+		print_state(philo, "\033[37;1mis thinking", 1);
 	}
 	return (NULL);
 }
@@ -198,7 +195,8 @@ int main(int ac, char **av)
     {
         if (parsing(av))
         {
-            get_info(&data, ac, av);
+            if (!get_info(&data, ac, av))
+				return (0);
 			philos = malloc(sizeof(t_philo) * data.number_of_philosophers);
 			if (!init_mutexs(&data))
 				return (0);
