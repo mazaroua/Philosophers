@@ -15,24 +15,23 @@ typedef struct data
 	int				time_to_sleep;
     int				n_of_times_each_philo_must_eat;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	last_meal;
 	pthread_mutex_t	write;
+	pthread_mutex_t	eaten_mutex;
     long            start_of_simulation;
-    pthread_mutex_t stop_mutex;
-    pthread_mutex_t eaten_mutex;
-    pthread_mutex_t ate;
-    int             stop;
     int             all_eaten;
+    int             stop;
+    pthread_mutex_t stop_mutex;
 }t_data;
 
 typedef struct philo
 {
-    int             id;
-    pthread_t       philo;
     pthread_mutex_t *right_fork;
     pthread_mutex_t *left_fork;
-    long            last_meal;
+    pthread_mutex_t last_meal_mutex;
     t_data          *data;
+    int             id;
+    pthread_t       philo;
+    long            last_meal;
     int             ate;
 }t_philo;
 
@@ -42,6 +41,10 @@ int		parsing(char **av);
 long	curr_time(void);
 void	ft_usleep(long time);
 int	print_state(t_philo *philo, char *state, int unlock);
+int	get_info(t_data *data, int ac, char **av);
+int	init_mutexs(t_data *data);
+int	creating_philos(t_data *data, t_philo *philos);
+void	*routine(void *arg);
 int	check(t_philo *philo, t_data *data);
 
 #endif
