@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/02 17:17:17 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/06/02 18:33:48 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/06/03 21:15:36 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,11 @@ int	creating_philos(t_data *data, t_philo *philos)
 			philos[i].right_fork = &data->forks[i - 1];
 		philos[i].left_fork = &data->forks[i];
 		philos[i].ate = 0;
+		philos[i].have_ate = 0;
 		philos[i].last_meal = curr_time();
 		philos[i].data = data;
 		pthread_mutex_init(&philos[i].last_meal_mutex, NULL);
+		pthread_mutex_init(&philos[i].ate_mutex, NULL);
 		if (pthread_create(&philos[i].philo, NULL, &routine, &philos[i]) != 0)
 			return (0);
 		i++;

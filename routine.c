@@ -6,7 +6,7 @@
 /*   By: mazaroua <mazaroua@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/02 17:18:28 by mazaroua          #+#    #+#             */
-/*   Updated: 2023/06/02 18:39:07 by mazaroua         ###   ########.fr       */
+/*   Updated: 2023/06/03 21:36:55 by mazaroua         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,28 +60,22 @@ int	unlock_forks(t_philo *philo)
 
 int	start_eating(t_philo *philo)
 {
-	pthread_mutex_lock(&philo->data->stop_mutex);
-	if (philo->data->stop == 1)
-	{
-		pthread_mutex_unlock(&philo->data->stop_mutex);
-		return (0);
-	}
-	pthread_mutex_unlock(&philo->data->stop_mutex);
 	if (philo->ate == philo->data->n_of_times_each_philo_must_eat)
 	{
 		pthread_mutex_lock(&philo->data->eaten_mutex);
+		philo->have_ate = 1;
 		philo->data->all_eaten += 1;
 		pthread_mutex_unlock(&philo->data->eaten_mutex);
 		return (0);
 	}
-		lock_forks(philo);
-		print_state(philo, "\x1B[32mis eating", 1);
-		philo->ate += 1;
-		pthread_mutex_lock(&philo->last_meal_mutex);
-		philo->last_meal = curr_time();
-		pthread_mutex_unlock(&philo->last_meal_mutex);
-		ft_usleep(philo->data->time_to_eat);
-		unlock_forks(philo);
+	lock_forks(philo);
+	print_state(philo, "\x1B[32mis eating", 1);
+	philo->ate += 1;
+	pthread_mutex_lock(&philo->last_meal_mutex);
+	philo->last_meal = curr_time();
+	pthread_mutex_unlock(&philo->last_meal_mutex);
+	ft_usleep(philo->data->time_to_eat);
+	unlock_forks(philo);
 	return (1);
 }
 

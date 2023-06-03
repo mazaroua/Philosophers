@@ -28,6 +28,8 @@ typedef struct philo
     pthread_mutex_t *right_fork;
     pthread_mutex_t *left_fork;
     pthread_mutex_t last_meal_mutex;
+    pthread_mutex_t ate_mutex;
+    int             have_ate;
     t_data          *data;
     int             id;
     pthread_t       philo;
